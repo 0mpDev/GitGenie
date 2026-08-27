@@ -1,0 +1,22 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Java
+target/
+*.class
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
