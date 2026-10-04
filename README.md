@@ -203,6 +203,3 @@ Supported file types include common source languages (Java, TypeScript, Python, 
 - Per-file filters and `.gitignore`-style include rules
 - Docker Compose for one-command startup
 
-## License
-
-Add a license of your choice (for example MIT) before publishing.
