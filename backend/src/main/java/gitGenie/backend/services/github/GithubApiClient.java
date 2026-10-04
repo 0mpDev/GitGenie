@@ -65,7 +65,10 @@ public class GithubApiClient {
     public String getFileContent(String accessToken, String owner, String repo, String path) {
         Map<String, Object> body = client(accessToken)
                 .get()
-                .uri("/repos/{owner}/{repo}/contents/{path}", owner, repo, path)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repos/{owner}/{repo}/contents/")
+                        .path(path)
+                        .build(owner, repo))
                 .retrieve()
                 .body(MAP);
         if (body == null) {
@@ -84,7 +87,8 @@ public class GithubApiClient {
     }
 
     private RestClient client(String accessToken){
-        return restClientBuilder
+        // clone(): never mutate the shared builder (headers would pile up / leak between users)
+        return restClientBuilder.clone()
                 .baseUrl(API_BASE)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json")

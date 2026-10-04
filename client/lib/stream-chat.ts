@@ -70,6 +70,16 @@ export async function streamChatMessage(
       const data = dataLines.join("\n");
       if (!data) continue;
 
+      if (event === "error") {
+        let message = data;
+        try {
+          message = JSON.parse(data) as string;
+        } catch {
+          // keep raw text
+        }
+        throw new Error(message);
+      }
+
       try {
         if (event === "token") {
           handlers.onToken?.(JSON.parse(data) as string);

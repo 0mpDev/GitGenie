@@ -5,11 +5,9 @@ import java.util.List;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.json.JsonMapper;
-
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gitGenie.backend.dto.CitationDto;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CitationMapper {
 
-    private final JsonMapper jsonMapper;
+    private final ObjectMapper jsonMapper;
 
     public CitationDto fromDocument(Document document) {
         var meta = document.getMetadata();
@@ -35,7 +33,7 @@ public class CitationMapper {
     public String toJson(List<CitationDto> citations) {
         try {
             return jsonMapper.writeValueAsString(citations);
-        } catch (JacksonException e) {
+        } catch (JsonProcessingException e) {
             return "[]";
         }
     }
@@ -46,7 +44,7 @@ public class CitationMapper {
         }
         try {
             return jsonMapper.readValue(json, new TypeReference<>() {});
-        } catch (JacksonException e) {
+        } catch (JsonProcessingException e) {
             return List.of();
         }
     }
