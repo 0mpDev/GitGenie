@@ -2,6 +2,8 @@
 
 **Chat with your GitHub repositories.** GitGenie signs you in with GitHub, indexes the code of any repo you choose, and lets you ask questions about it in plain English. Answers are grounded in the actual code and come with file citations that link back to GitHub.
 
+**Live demo:** <https://git-genie.duckdns.org>
+
 It is a Retrieval-Augmented Generation (RAG) app: your code is split into chunks, embedded locally, stored in PostgreSQL with pgvector, and the most relevant chunks are sent to an LLM (served by Groq) with every question.
 
 ---
@@ -36,6 +38,7 @@ Question ──► embed ──► similarity search (top 8 chunks) ◄───
 | AI | Spring AI 1.0.0, Groq (OpenAI-compatible API) for chat, ONNX `all-MiniLM-L6-v2` for embeddings |
 | Database | PostgreSQL 16 with the pgvector extension |
 | Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui on Base UI, TanStack Query, Streamdown |
+| Deployment | AWS EC2, Docker Compose, Nginx, Let's Encrypt, GitHub Actions |
 
 ## Project structure
 
@@ -183,6 +186,21 @@ Main settings live in `backend/src/main/resources/application.properties`.
 
 Supported file types include common source languages (Java, TypeScript, Python, Go, Rust, and others), Markdown, config files (YAML, JSON, TOML, XML), SQL and shell scripts. See `CodeFileFilter.java` for the full list.
 
+## Deployment (AWS EC2)
+
+The app is deployed on a single EC2 instance (Ubuntu 24.04, t3.small) using Docker Compose, with Nginx as a reverse proxy and HTTPS from Let's Encrypt.
+
+- `docker-compose.prod.yml` runs three containers: PostgreSQL with pgvector, the Spring Boot backend and the Next.js frontend.
+- Nginx serves everything from one domain: `/api`, `/oauth2` and `/login/oauth2` go to the backend, everything else goes to the frontend. A single origin keeps the session cookie working.
+- A GitHub Actions workflow (`.github/workflows/deploy.yml`) SSHes into the server on every push to `main`, pulls the code and rebuilds the containers.
+
+To deploy your own copy:
+
+1. Copy `.env.example` to `.env` and fill in the values (`DOMAIN` is the hostname without `https://`).
+2. Create a separate GitHub OAuth App for production with the callback `https://<domain>/login/oauth2/code/github`.
+3. Run `docker compose -f docker-compose.prod.yml up -d --build`.
+4. Put Nginx in front and enable HTTPS with Certbot.
+
 ## Troubleshooting
 
 | Problem | Fix |
@@ -201,5 +219,4 @@ Supported file types include common source languages (Java, TypeScript, Python, 
 - Smarter chunking by function or class
 - Line-accurate citations
 - Per-file filters and `.gitignore`-style include rules
-- Docker Compose for one-command startup
-
+- Docker Compose for local development
