@@ -33,7 +33,7 @@ export default function HomePage() {
           </div>
           <div className="space-y-3">
             <h1 className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
-              DevPilot
+              GitGenie
             </h1>
             <p className="text-lg text-muted-foreground text-balance">
               Connect GitHub, index any repository, and chat with your codebase
